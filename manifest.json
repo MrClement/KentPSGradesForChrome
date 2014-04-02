@@ -6,7 +6,9 @@
   "version": "1.0",
 
   "page_action": {
-    "default_icon": "icon.png"
+    "default_title": "PS Thing",
+    "default_icon": "icon.png",
+    "default_popup": "index.html"
   },
   "permissions": [
     "http://powerschool.kentdenver.org/",
