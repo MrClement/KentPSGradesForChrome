@@ -10,7 +10,8 @@
   },
   "permissions": [
     "http://powerschool.kentdenver.org/",
-    "https://powerschool.kentdenver.org/"
+    "https://powerschool.kentdenver.org/",
+    "https://www.google.com/"
   ]
 
 }
