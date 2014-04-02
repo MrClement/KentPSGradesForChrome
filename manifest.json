@@ -9,8 +9,8 @@
     "default_icon": "icon.png"
   },
   "permissions": [
-    "http://powerschool.kentdenver.org",
-    "https://powerschool.kentdenver.org"
+    "http://powerschool.kentdenver.org/",
+    "https://powerschool.kentdenver.org/"
   ]
 
 }
