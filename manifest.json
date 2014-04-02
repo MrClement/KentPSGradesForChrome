@@ -11,6 +11,7 @@
   "permissions": [
     "http://powerschool.kentdenver.org"
     "https://powerschool.kentdenver.org"
+    "test"
   ]
 
 }
