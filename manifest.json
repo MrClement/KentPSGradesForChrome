@@ -10,6 +10,12 @@
     "default_icon": "icon.png",
     "default_popup": "popup.html"
   },
+
+  "background": {
+    "scripts": ["bootstrap.js"],
+    "persistent": false
+  },
+
   "permissions": [
     "http://powerschool.kentdenver.org/",
     "https://powerschool.kentdenver.org/",
