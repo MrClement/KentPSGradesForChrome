@@ -48,10 +48,16 @@ var topLocs = topRows[0].getElementsByTagName("th");
 var gradeIndex;
 for(var i = 0 ; i < topLocs.length ; i++){
   if(topLocs[i].innerHTML.indexOf("Final Grade") > -1){
-  gradeIndex = i
+  gradeIndex = i;
+  }
 }
+var gradeHTML = topRows[1].getElementsByTagName("td")[gradeIndex];
+var gradeText = gradeHTML.innerHTML;
+if(gradeText.indexOf("%") == -1) {
+  gradeHTML.innerHTML += " " + studentPercentage + "%";
 }
-topRows[1].getElementsByTagName("td")[gradeIndex].innerHTML += studentPercentage;
+console.log(gradeText);
+
 
 
 console.log("Extension is loaded!")
