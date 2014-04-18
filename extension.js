@@ -30,20 +30,22 @@ for(var i = 1 ; i < rows.length ; i++) {
   var parsedRows = rows[i].getElementsByTagName("td");
   var singleScore = new Array();
   singleScore[0] = parsedRows[categoryLoc].innerHTML;
-  singleScore[1] = parsedRows[scoreLoc+4].getElementsByTagName("span")[0].innerHTML;
-  console.log(singleScore[1]);
-  var as = parsedRows[scoreLoc+4].getElementsByTagName("span")[0].getElementsByTagName("a");
-  var newScore = singleScore[1].split("/");
-  if(as.length > 0) {
+  var purple = parsedRows[scoreLoc+2].innerHTML;
+  var orange = parsedRows[scoreLoc+3].innerHTML;
+  if(purple == "" && orange == "" ) {
+    singleScore[1] = parsedRows[scoreLoc+4].getElementsByTagName("span")[0].innerHTML;
+    var as = parsedRows[scoreLoc+4].getElementsByTagName("span")[0].getElementsByTagName("a");
+    var newScore = singleScore[1].split("/");
+    if(as.length > 0) {
       newScore[0] = newScore[0].substring(newScore[0].indexOf(">")+1, newScore[0].length-1);
-      console.log(newScore[0]);
       earnedPoints += parseInt(newScore[0]);
       totalPoints += parseInt(newScore[2]);
-  } else if(newScore[0].indexOf("-") == -1) {
-      earnedPoints += parseInt(newScore[0]);
-      totalPoints += parseInt(newScore[1]);
+    } else if(newScore[0].indexOf("-") == -1) {
+        earnedPoints += parseInt(newScore[0]);
+        totalPoints += parseInt(newScore[1]);
+    }
+    scoreData[i-1] = singleScore;
   }
-  scoreData[i-1] = singleScore;
 }
 var studentPercentage = earnedPoints / totalPoints *100;
 studentPercentage = parseFloat(studentPercentage).toFixed(2);
@@ -61,7 +63,6 @@ var gradeText = gradeHTML.innerHTML;
 if(gradeText.indexOf("%") == -1) {
   gradeHTML.innerHTML += " " + studentPercentage + "%";
 }
-console.log(gradeText);
 
 var htmlToInsert = '<form action=""> <input type="checkbox" name="weighted" value="Weighted">Weighted by category?<br></form>';
 
