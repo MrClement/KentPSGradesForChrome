@@ -1,11 +1,25 @@
 var categories;
+var formElementNoCategories;
+var formElementWithCategories;
+var newNode;
 
 function showOrHideCategories(){
   if(document.getElementsByName("weighted")[0].checked) {
     console.log("show");
     console.log(categories);
+    var htmlToInsert = '<form action=""><input type="checkbox" name="weighted" value="Weighted" checked="true">Weighted by category?<br><br>';
+    htmlToInsert +='<table name="cats" border=1><tr><th align="center">Category</th><th align="center">Weighting</th></tr>';
+    for(var i = 0 ; i < categories.length ; i++) {
+      htmlToInsert +='<tr><td align="center">' + categories[i]+'</td>';
+      htmlToInsert +='<td align="center"><input type="text" name=\"'+categories[i]+ '\">%</td>';
+      htmlToInsert += '</tr>';
+    }
+    htmlToInsert += '<tr><td></td><td align="center"><input type="button" value="Update Final Grade"></td></tr></table></form>';
+    newNode.innerHTML = htmlToInsert;
   } else {
   console.log("hide");
+  htmlToInsert = '<form action=""><input type="checkbox" name="weighted" value="Weighted">Weighted by category?<br></form>';
+  newNode.innerHTML = htmlToInsert;
 }
 }
 function main() {
@@ -87,9 +101,11 @@ var htmlToInsert = '<form action=""><input type="checkbox" name="weighted" value
 var content = document.getElementById("content-main");
 var newNode = document.createElement("div");
 newNode.innerHTML = htmlToInsert;
+this.newNode = newNode;
 newNode.addEventListener("change", showOrHideCategories, false);
 var target = content.getElementsByTagName("table")[1];
 content.insertBefore(newNode, target);
+
 
 
 console.log("Extension is loaded!");
