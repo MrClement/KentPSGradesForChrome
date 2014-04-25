@@ -2,11 +2,10 @@ var categories;
 var formElementNoCategories;
 var formElementWithCategories;
 var newNode;
+var globalScoreData;
 
 function showOrHideCategories(){
   if(document.getElementsByName("weighted")[0].checked) {
-    console.log("show");
-    console.log(categories);
     var htmlToInsert = '<form action=""><input type="checkbox" name="weighted" value="Weighted" checked="true">Weighted by category?<br><br>';
     htmlToInsert +='<table name="cats" border=1><tr><th align="center">Category</th><th align="center">Weighting</th></tr>';
     for(var i = 0 ; i < categories.length ; i++) {
@@ -14,13 +13,35 @@ function showOrHideCategories(){
       htmlToInsert +='<td align="center"><input type="text" name=\"'+categories[i]+ '\">%</td>';
       htmlToInsert += '</tr>';
     }
-    htmlToInsert += '<tr><td></td><td align="center"><input type="button" value="Update Final Grade"></td></tr></table></form>';
+    htmlToInsert += '<tr><td></td><td align="center"><input type="button" id="calcButton" value="Update Final Grade"></td></tr></table></form>';
     newNode.innerHTML = htmlToInsert;
+    document.getElementById("calcButton").addEventListener("click", reCalculate, false);
+    document.getElementsByName("weighted")[0].addEventListener("change", showOrHideCategories, false);
+
   } else {
-  console.log("hide");
   htmlToInsert = '<form action=""><input type="checkbox" name="weighted" value="Weighted">Weighted by category?<br></form>';
   newNode.innerHTML = htmlToInsert;
+  document.getElementsByName("weighted")[0].addEventListener("change", showOrHideCategories, false);
+
 }
+}
+function reCalculate(){
+  console.log(globalScoreData);
+  var categoryScores = new Array();
+  categoryScores.length = categories.length;
+  for(var i = 0 ; i < globalScoreData.length ; i++) {
+    var loc = categoryScores[categories.indexOf(globalScoreData[i][0])];
+    if(loc === undefined) {
+      loc = new Array();
+      loc.length = 2;
+      loc[0] = 0;
+      loc[1] = 0;
+    }
+    loc[0] += globalScoreData[i][2];
+    loc[1] += globalScoreData[i][3];
+    categoryScores[categories.indexOf(globalScoreData[i][0])] = loc;
+  }
+  console.log(categoryScores);
 }
 function main() {
   var tables = document.getElementsByTagName("table");
@@ -80,19 +101,22 @@ for(var i = 1 ; i < rows.length ; i++) {
     if(as.length > 0) {
       newScore[0] = newScore[0].substring(newScore[0].indexOf(">")+1, newScore[0].length-1);
       earnedPoints += parseInt(newScore[0]);
+      singleScore[2] = parseInt(newScore[0]);
       totalPoints += parseInt(newScore[2]);
+      singleScore[3] = parseInt(newScore[2]);
     } else if(newScore[0].indexOf("-") == -1) {
         earnedPoints += parseInt(newScore[0]);
-        totalPoints += parseInt(newScore[1]);
+        singleScore[2] = parseInt(newScore[0]);
+        totalPoints += newScore.length == 1 ? 0 : parseInt(newScore[1]);
+        singleScore[3] = newScore.length == 1 ? 0 : parseInt(newScore[1]);
     }
     scoreData[i-1] = singleScore;
   }
 }
-console.log(categories);
 var studentPercentage = earnedPoints / totalPoints *100;
 studentPercentage = parseFloat(studentPercentage).toFixed(2);
 
-
+globalScoreData = scoreData;
 if(gradeText.indexOf("%") == -1) {
   gradeHTML.innerHTML += " " + studentPercentage + "%";
 }
@@ -102,10 +126,10 @@ var content = document.getElementById("content-main");
 var newNode = document.createElement("div");
 newNode.innerHTML = htmlToInsert;
 this.newNode = newNode;
-newNode.addEventListener("change", showOrHideCategories, false);
+
 var target = content.getElementsByTagName("table")[1];
 content.insertBefore(newNode, target);
-
+document.getElementsByName("weighted")[0].addEventListener("change", showOrHideCategories, false);
 
 
 console.log("Extension is loaded!");
