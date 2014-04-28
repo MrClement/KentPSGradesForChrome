@@ -3,14 +3,15 @@ var formElementNoCategories;
 var formElementWithCategories;
 var newNode;
 var globalScoreData;
+var finalGradeHTML;
 
 function showOrHideCategories(){
   if(document.getElementsByName("weighted")[0].checked) {
     var htmlToInsert = '<form action=""><input type="checkbox" name="weighted" value="Weighted" checked="true">Weighted by category?<br><br>';
-    htmlToInsert +='<table name="cats" border=1><tr><th align="center">Category</th><th align="center">Weighting</th></tr>';
+    htmlToInsert +='<table id="cats" border=1><tr><th align="center">Category</th><th align="center">Weighting</th></tr>';
     for(var i = 0 ; i < categories.length ; i++) {
       htmlToInsert +='<tr><td align="center">' + categories[i]+'</td>';
-      htmlToInsert +='<td align="center"><input type="text" name=\"'+categories[i]+ '\">%</td>';
+      htmlToInsert +='<td align="center"><input type="text" id=\"'+categories[i]+ '\">%</td>';
       htmlToInsert += '</tr>';
     }
     htmlToInsert += '<tr><td></td><td align="center"><input type="button" id="calcButton" value="Update Final Grade"></td></tr></table></form>';
@@ -22,26 +23,38 @@ function showOrHideCategories(){
   htmlToInsert = '<form action=""><input type="checkbox" name="weighted" value="Weighted">Weighted by category?<br></form>';
   newNode.innerHTML = htmlToInsert;
   document.getElementsByName("weighted")[0].addEventListener("change", showOrHideCategories, false);
-
-}
+  }
 }
 function reCalculate(){
-  console.log(globalScoreData);
   var categoryScores = new Array();
   categoryScores.length = categories.length;
   for(var i = 0 ; i < globalScoreData.length ; i++) {
     var loc = categoryScores[categories.indexOf(globalScoreData[i][0])];
     if(loc === undefined) {
       loc = new Array();
-      loc.length = 2;
+      loc.length = 3;
       loc[0] = 0;
       loc[1] = 0;
+      var temp = document.getElementById(""+globalScoreData[i][0]).value;
+      temp = parseInt(temp);
+      if(!isNaN(temp)) {
+        loc[2] = temp;
+        console.log("here");
+      } else {
+        alert("Please enter weightings as numbers only");
+      }
     }
     loc[0] += globalScoreData[i][2];
     loc[1] += globalScoreData[i][3];
     categoryScores[categories.indexOf(globalScoreData[i][0])] = loc;
   }
-  console.log(categoryScores);
+  var newGrade = 0;
+  for(var i = 0 ; i < categories.length; i++) {
+      newGrade += (categoryScores[i][0]/categoryScores[i][1])*categoryScores[i][2]/100;
+  }
+  newGrade *= 100;
+  newGrade = parseFloat(newGrade).toFixed(2);
+  finalGradeHTML.innerHTML += "-" + newGrade +"%";
 }
 function main() {
   var tables = document.getElementsByTagName("table");
@@ -67,6 +80,7 @@ for(var i = 0 ; i < topLocs.length ; i++){
   }
 }
 var gradeHTML = topRows[1].getElementsByTagName("td")[gradeIndex];
+finalGradeHTML = gradeHTML;
 var gradeText = gradeHTML.innerHTML;
 
 if(gradeText.indexOf("%") == -1) {
@@ -118,7 +132,7 @@ studentPercentage = parseFloat(studentPercentage).toFixed(2);
 
 globalScoreData = scoreData;
 if(gradeText.indexOf("%") == -1) {
-  gradeHTML.innerHTML += " " + studentPercentage + "%";
+  gradeHTML.innerHTML += "-" + studentPercentage + "%";
 }
 
 var htmlToInsert = '<form action=""><input type="checkbox" name="weighted" value="Weighted">Weighted by category?<br></form>';
