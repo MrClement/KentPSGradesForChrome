@@ -4,6 +4,7 @@ var formElementWithCategories;
 var newNode;
 var globalScoreData;
 var finalGradeHTML;
+var oldGrade;
 
 function showOrHideCategories(){
   if(document.getElementsByName("weighted")[0].checked) {
@@ -16,12 +17,14 @@ function showOrHideCategories(){
     }
     htmlToInsert += '<tr><td></td><td align="center"><input type="button" id="calcButton" value="Update Final Grade"></td></tr></table></form>';
     newNode.innerHTML = htmlToInsert;
+    oldGrade = finalGradeHTML.innerHTML;
     document.getElementById("calcButton").addEventListener("click", reCalculate, false);
     document.getElementsByName("weighted")[0].addEventListener("change", showOrHideCategories, false);
 
   } else {
     htmlToInsert = '<form action=""><input type="checkbox" name="weighted" value="Weighted">Weighted by category?<br></form>';
     newNode.innerHTML = htmlToInsert;
+    finalGradeHTML.innerHTML = oldGrade;
     document.getElementsByName("weighted")[0].addEventListener("change", showOrHideCategories, false);
   }
 }
