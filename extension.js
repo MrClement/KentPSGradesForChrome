@@ -54,7 +54,9 @@ function reCalculate(){
   }
   newGrade *= 100;
   newGrade = parseFloat(newGrade).toFixed(2);
-  finalGradeHTML.innerHTML += "-" + newGrade +"%";
+  var orgGrade = finalGradeHTML.innerHTML;
+  orgGrade = orgGrade.substring(0, orgGrade.indexOf("(") + 1) + newGrade + "%)";
+  finalGradeHTML.innerHTML = orgGrade;
 }
 function main() {
   var tables = document.getElementsByTagName("table");
@@ -132,7 +134,7 @@ studentPercentage = parseFloat(studentPercentage).toFixed(2);
 
 globalScoreData = scoreData;
 if(gradeText.indexOf("%") == -1) {
-  gradeHTML.innerHTML += "-" + studentPercentage + "%";
+  gradeHTML.innerHTML += "(" + studentPercentage + "%)";
 }
 
 var htmlToInsert = '<form action=""><input type="checkbox" name="weighted" value="Weighted">Weighted by category?<br></form>';
