@@ -36,7 +36,7 @@ function reCalculate(){
       loc[0] = 0;
       loc[1] = 0;
       var temp = document.getElementById(""+globalScoreData[i][0]).value;
-      temp = parseInt(temp);
+      temp = parseFloat(temp);
       if(!isNaN(temp)) {
         loc[2] = temp;
         console.log("here");
@@ -116,19 +116,21 @@ function main() {
         var newScore = singleScore[1].split("/");
         if(as.length > 0) {
           newScore[0] = newScore[0].substring(newScore[0].indexOf(">")+1, newScore[0].length-1);
-          earnedPoints += parseInt(newScore[0]);
-          singleScore[2] = parseInt(newScore[0]);
-          totalPoints += parseInt(newScore[2]);
-          singleScore[3] = parseInt(newScore[2]);
+          earnedPoints += parseFloat(newScore[0]);
+          singleScore[2] = parseFloat(newScore[0]);
+          totalPoints += parseFloat(newScore[2]);
+          singleScore[3] = parseFloat(newScore[2]);
         } else if(newScore[0].indexOf("-") == -1) {
-          earnedPoints += parseInt(newScore[0]);
-          singleScore[2] = parseInt(newScore[0]);
-          totalPoints += newScore.length == 1 ? 0 : parseInt(newScore[1]);
-          singleScore[3] = newScore.length == 1 ? 0 : parseInt(newScore[1]);
+          earnedPoints += parseFloat(newScore[0]);
+          singleScore[2] = parseFloat(newScore[0]);
+          totalPoints += newScore.length == 1 ? 0 : parseFloat(newScore[1]);
+          singleScore[3] = newScore.length == 1 ? 0 : parseFloat(newScore[1]);
         }
         scoreData[i-1] = singleScore;
       }
     }
+    console.log(scoreData);
+    console.log(earnedPoints + " " + totalPoints);
     var studentPercentage = earnedPoints / totalPoints *100;
     studentPercentage = parseFloat(studentPercentage).toFixed(2);
 
