@@ -29,24 +29,28 @@ function reCalculate(){
   var categoryScores = new Array();
   categoryScores.length = categories.length;
   for(var i = 0 ; i < globalScoreData.length ; i++) {
-    var loc = categoryScores[categories.indexOf(globalScoreData[i][0])];
-    if(loc === undefined) {
-      loc = new Array();
-      loc.length = 3;
-      loc[0] = 0;
-      loc[1] = 0;
-      var temp = document.getElementById(""+globalScoreData[i][0]).value;
-      temp = parseFloat(temp);
-      if(!isNaN(temp)) {
-        loc[2] = temp;
-        console.log("here");
-      } else {
-        alert("Please enter weightings as numbers only");
+    console.log(globalScoreData[i]);
+    if(globalScoreData[i][0] != "NotACategory" && globalScoreData[i].length == 4) {
+      var loc = categoryScores[categories.indexOf(globalScoreData[i][0])];
+      if(loc === undefined) {
+        loc = new Array();
+        loc.length = 3;
+        loc[0] = 0;
+        loc[1] = 0;
+        var temp = document.getElementById(""+globalScoreData[i][0]).value;
+        temp = parseFloat(temp);
+        if(!isNaN(temp)) {
+          loc[2] = temp;
+        } else {
+          alert("Please enter weightings as numbers only");
+        }
       }
+      loc[0] += globalScoreData[i][2];
+      console.log(loc[0]);
+      loc[1] += globalScoreData[i][3];
+      console.log(loc[1]);
+      categoryScores[categories.indexOf(globalScoreData[i][0])] = loc;
     }
-    loc[0] += globalScoreData[i][2];
-    loc[1] += globalScoreData[i][3];
-    categoryScores[categories.indexOf(globalScoreData[i][0])] = loc;
   }
   var newGrade = 0;
   for(var i = 0 ; i < categories.length; i++) {
@@ -104,13 +108,13 @@ function main() {
     for(var i = 1 ; i < rows.length ; i++) {
       var parsedRows = rows[i].getElementsByTagName("td");
       var singleScore = new Array();
-      singleScore[0] = parsedRows[categoryLoc].innerHTML;
-      if(categories.indexOf(singleScore[0]) == -1) {
-        categories.push(singleScore[0]);
-      }
       var purple = parsedRows[scoreLoc+2].innerHTML;
       var orange = parsedRows[scoreLoc+3].innerHTML;
       if(purple == "" && orange == "" ) {
+        singleScore[0] = parsedRows[categoryLoc].innerHTML;
+        if(categories.indexOf(singleScore[0]) == -1) {
+          categories.push(singleScore[0]);
+        }
         singleScore[1] = parsedRows[scoreLoc+4].getElementsByTagName("span")[0].innerHTML;
         var as = parsedRows[scoreLoc+4].getElementsByTagName("span")[0].getElementsByTagName("a");
         var newScore = singleScore[1].split("/");
@@ -127,10 +131,10 @@ function main() {
           singleScore[3] = newScore.length == 1 ? 0 : parseFloat(newScore[1]);
         }
         scoreData[i-1] = singleScore;
+      } else {
+        scoreData[i-1] = ["NotACategory", "", "", ""];
       }
     }
-    console.log(scoreData);
-    console.log(earnedPoints + " " + totalPoints);
     var studentPercentage = earnedPoints / totalPoints *100;
     studentPercentage = parseFloat(studentPercentage).toFixed(2);
 
