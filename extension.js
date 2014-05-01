@@ -32,7 +32,6 @@ function reCalculate(){
   var categoryScores = new Array();
   categoryScores.length = categories.length;
   for(var i = 0 ; i < globalScoreData.length ; i++) {
-    console.log(globalScoreData[i]);
     if(globalScoreData[i][0] != "NotACategory" && globalScoreData[i].length == 4) {
       var loc = categoryScores[categories.indexOf(globalScoreData[i][0])];
       if(loc === undefined) {
@@ -49,9 +48,7 @@ function reCalculate(){
         }
       }
       loc[0] += globalScoreData[i][2];
-      console.log(loc[0]);
       loc[1] += globalScoreData[i][3];
-      console.log(loc[1]);
       categoryScores[categories.indexOf(globalScoreData[i][0])] = loc;
     }
   }
@@ -118,9 +115,7 @@ function main() {
         if(singleScore[0].indexOf(">") > -1) {
           singleScore[0] = singleScore[0].substring(singleScore[0].indexOf(">") + 1, singleScore[0].indexOf("</"));
         }
-        if(categories.indexOf(singleScore[0]) == -1) {
-          categories.push(singleScore[0]);
-        }
+
         singleScore[1] = parsedRows[scoreLoc+4].getElementsByTagName("span")[0].innerHTML;
         var as = parsedRows[scoreLoc+4].getElementsByTagName("span")[0].getElementsByTagName("a");
         var newScore = singleScore[1].split("/");
@@ -135,6 +130,9 @@ function main() {
           singleScore[2] = parseFloat(newScore[0]);
           totalPoints += newScore.length == 1 ? 0 : parseFloat(newScore[1]);
           singleScore[3] = newScore.length == 1 ? 0 : parseFloat(newScore[1]);
+        }
+        if(categories.indexOf(singleScore[0]) == -1 && newScore[0].indexOf("-") == -1) {
+          categories.push(singleScore[0]);
         }
         scoreData[i-1] = singleScore;
       } else {
