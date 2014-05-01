@@ -115,6 +115,9 @@ function main() {
       var orange = parsedRows[scoreLoc+3].innerHTML;
       if(purple == "" && orange == "" ) {
         singleScore[0] = parsedRows[categoryLoc].innerHTML;
+        if(singleScore[0].indexOf(">") > -1) {
+          singleScore[0] = singleScore[0].substring(singleScore[0].indexOf(">") + 1, singleScore[0].indexOf("</"));
+        }
         if(categories.indexOf(singleScore[0]) == -1) {
           categories.push(singleScore[0]);
         }
