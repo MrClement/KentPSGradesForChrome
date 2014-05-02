@@ -110,7 +110,7 @@ function main() {
       var singleScore = new Array();
       var purple = parsedRows[scoreLoc+2].innerHTML;
       var orange = parsedRows[scoreLoc+3].innerHTML;
-      if(purple == "" && orange == "" ) {
+      if(purple == "" && orange == "" && parsedRows[scoreLoc+4].innerHTML.indexOf("Score Not Published") == -1) {
         singleScore[0] = parsedRows[categoryLoc].innerHTML;
         if(singleScore[0].indexOf(">") > -1) {
           singleScore[0] = singleScore[0].substring(singleScore[0].indexOf(">") + 1, singleScore[0].indexOf("</"));
