@@ -103,6 +103,10 @@ function main() {
   var gradeHTML = topRows[1].getElementsByTagName("td")[gradeIndex];
   finalGradeHTML = gradeHTML;
   className = topRows[1].getElementsByTagName("td")[classNameIndex].innerHTML;
+  loadData();
+  if(isWeighted) {
+    
+  }
   var gradeText = gradeHTML.innerHTML;
 
   if(gradeText.indexOf("%") == -1) {
@@ -200,14 +204,11 @@ function saveChanges() {
 }
 
 function loadData() {
-  console.log(className);
   chrome.storage.sync.get(className, function(object) {
     var realData = object[className];
-    console.log(realData);
     isWeighted = realData.weighted;
     weightings = realData.weightings;
     className = realData.name;
-    console.log(isWeighted +  " " + weightings + " " + className);
   });
 }
 
