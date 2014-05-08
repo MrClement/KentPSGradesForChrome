@@ -6,8 +6,13 @@ var globalScoreData;
 var finalGradeHTML;
 var oldGrade;
 
+var className;
+var isWeighted;
+var weightings;
+
 function showOrHideCategories(){
   if(document.getElementsByName("weighted")[0].checked) {
+    loadData();
     var htmlToInsert = '<form action=""><input type="checkbox" name="weighted" value="Weighted" checked="true">Weighted by category?<br><br>';
     htmlToInsert +='<table id="cats" border=1><tr><th align="center">Category</th><th align="center">Weighting</th></tr>';
     for(var i = 0 ; i < categories.length ; i++) {
@@ -22,6 +27,7 @@ function showOrHideCategories(){
     document.getElementsByName("weighted")[0].addEventListener("change", showOrHideCategories, false);
 
   } else {
+    isWeighted = false;
     htmlToInsert = '<form action=""><input type="checkbox" name="weighted" value="Weighted">Weighted by category?<br></form>';
     newNode.innerHTML = htmlToInsert;
     finalGradeHTML.innerHTML = oldGrade;
@@ -29,6 +35,8 @@ function showOrHideCategories(){
   }
 }
 function reCalculate(){
+  isWeighted = true;
+  weightings = {};
   var categoryScores = new Array();
   categoryScores.length = categories.length;
   for(var i = 0 ; i < globalScoreData.length ; i++) {
@@ -43,6 +51,7 @@ function reCalculate(){
         temp = parseFloat(temp);
         if(!isNaN(temp)) {
           loc[2] = temp;
+          weightings[globalScoreData[i][0]] = temp;
         } else {
           alert("Please enter weightings as numbers only");
         }
@@ -61,8 +70,10 @@ function reCalculate(){
   var orgGrade = finalGradeHTML.innerHTML;
   orgGrade = orgGrade.substring(0, orgGrade.indexOf("(") + 1) + newGrade + "%)";
   finalGradeHTML.innerHTML = orgGrade;
+  saveChanges();
 }
 function main() {
+  if(isWeighted === undefined) isWeighted = false;
   var tables = document.getElementsByTagName("table");
   var header;
   var headerIndex;
@@ -80,13 +91,18 @@ function main() {
   var topRows = finalHeader.getElementsByTagName("tr");
   var topLocs = topRows[0].getElementsByTagName("th");
   var gradeIndex;
+  var classNameIndex;
   for(var i = 0 ; i < topLocs.length ; i++){
     if(topLocs[i].innerHTML.indexOf("Final Grade") > -1){
       gradeIndex = i;
     }
+    if(topLocs[i].innerHTML.indexOf("Course") > -1) {
+      classNameIndex = i;
+    }
   }
   var gradeHTML = topRows[1].getElementsByTagName("td")[gradeIndex];
   finalGradeHTML = gradeHTML;
+  className = topRows[1].getElementsByTagName("td")[classNameIndex].innerHTML;
   var gradeText = gradeHTML.innerHTML;
 
   if(gradeText.indexOf("%") == -1) {
@@ -121,10 +137,12 @@ function main() {
         var newScore = singleScore[1].split("/");
         if(as.length > 0) {
           newScore[0] = newScore[0].substring(newScore[0].indexOf(">")+1, newScore[0].length-1);
-          earnedPoints += parseFloat(newScore[0]);
-          singleScore[2] = parseFloat(newScore[0]);
-          totalPoints += parseFloat(newScore[2]);
-          singleScore[3] = parseFloat(newScore[2]);
+          if(newScore[0].indexOf("-") == -1) {
+            earnedPoints += parseFloat(newScore[0]);
+            singleScore[2] = parseFloat(newScore[0]);
+            totalPoints += parseFloat(newScore[2]);
+            singleScore[3] = parseFloat(newScore[2]);
+          }
         } else if(newScore[0].indexOf("-") == -1) {
           earnedPoints += parseFloat(newScore[0]);
           singleScore[2] = parseFloat(newScore[0]);
@@ -160,6 +178,37 @@ function main() {
 
     console.log("Extension is loaded!");
   }
+}
+
+function saveChanges() {
+        // Get a value saved in a form.
+        var theValue = "textarea.value";
+        // Check that there's some code there.
+        if (!theValue) {
+          alert('Error: No value specified');
+          return;
+        }
+        // Save it using the Chrome extension storage API.
+        var objectToStore = {name: className, weighted : isWeighted, weightings : weightings};
+        console.log(objectToStore.name + "  " + objectToStore.weighted);
+        var jsonfile = {};
+        jsonfile[className] = objectToStore;
+        chrome.storage.sync.set(jsonfile, function() {
+          // Notify that we saved.
+          //alert('Settings saved' + chrome.runtime.lastError);
+        });
+}
+
+function loadData() {
+  console.log(className);
+  chrome.storage.sync.get(className, function(object) {
+    var realData = object[className];
+    console.log(realData);
+    isWeighted = realData.weighted;
+    weightings = realData.weightings;
+    className = realData.name;
+    console.log(isWeighted +  " " + weightings + " " + className);
+  });
 }
 
 main();
