@@ -12,12 +12,15 @@ var weightings;
 
 function showOrHideCategories(){
   if(document.getElementsByName("weighted")[0].checked) {
-    loadData();
     var htmlToInsert = '<form action=""><input type="checkbox" name="weighted" value="Weighted" checked="true">Weighted by category?<br><br>';
     htmlToInsert +='<table id="cats" border=1><tr><th align="center">Category</th><th align="center">Weighting</th></tr>';
     for(var i = 0 ; i < categories.length ; i++) {
       htmlToInsert +='<tr><td align="center">' + categories[i]+'</td>';
-      htmlToInsert +='<td align="center"><input type="text" id=\"'+categories[i]+ '\">%</td>';
+      var weight = "";
+      if(weightings[categories[i]] !== undefined) {
+        weight = weightings[categories[i]];
+      }
+      htmlToInsert +='<td align="center"><input value="'+weight+'" type="text" id=\"'+categories[i]+ '\">%</td>';
       htmlToInsert += '</tr>';
     }
     htmlToInsert += '<tr><td></td><td align="center"><input type="button" id="calcButton" value="Update Final Grade"></td></tr></table></form>';
@@ -32,6 +35,7 @@ function showOrHideCategories(){
     newNode.innerHTML = htmlToInsert;
     finalGradeHTML.innerHTML = oldGrade;
     document.getElementsByName("weighted")[0].addEventListener("change", showOrHideCategories, false);
+    saveChanges();
   }
 }
 function reCalculate(){
@@ -73,7 +77,7 @@ function reCalculate(){
   saveChanges();
 }
 function main() {
-  if(isWeighted === undefined) isWeighted = false;
+
   var tables = document.getElementsByTagName("table");
   var header;
   var headerIndex;
@@ -103,113 +107,166 @@ function main() {
   var gradeHTML = topRows[1].getElementsByTagName("td")[gradeIndex];
   finalGradeHTML = gradeHTML;
   className = topRows[1].getElementsByTagName("td")[classNameIndex].innerHTML;
-  loadData();
-  if(isWeighted) {
-    
-  }
+
   var gradeText = gradeHTML.innerHTML;
 
   if(gradeText.indexOf("%") == -1) {
 
-    categories = new Array();
-    var rows = header.getElementsByTagName("tr");
-    var locs = rows[0].getElementsByTagName("th");
-    var locTitles = new Array();
-    for(var i = 0 ; i < locs.length ; i++){
-      locTitles[i] = locs[i].innerHTML;
-    }
+    if(isWeighted === undefined) isWeighted = false;
+    loadData();
 
-    var scoreData = new Array();
-    var categoryLoc = locTitles.indexOf("Category");
-    var scoreLoc = locTitles.indexOf("Score");
-    var totalPoints = 0;
-    var earnedPoints = 0;
-
-    for(var i = 1 ; i < rows.length ; i++) {
-      var parsedRows = rows[i].getElementsByTagName("td");
-      var singleScore = new Array();
-      var purple = parsedRows[scoreLoc+2].innerHTML;
-      var orange = parsedRows[scoreLoc+3].innerHTML;
-      if(purple == "" && orange == "" && parsedRows[scoreLoc+4].innerHTML.indexOf("Score Not Published") == -1) {
-        singleScore[0] = parsedRows[categoryLoc].innerHTML;
-        if(singleScore[0].indexOf(">") > -1) {
-          singleScore[0] = singleScore[0].substring(singleScore[0].indexOf(">") + 1, singleScore[0].indexOf("</"));
-        }
-
-        singleScore[1] = parsedRows[scoreLoc+4].getElementsByTagName("span")[0].innerHTML;
-        var as = parsedRows[scoreLoc+4].getElementsByTagName("span")[0].getElementsByTagName("a");
-        var newScore = singleScore[1].split("/");
-        if(as.length > 0) {
-          newScore[0] = newScore[0].substring(newScore[0].indexOf(">")+1, newScore[0].length-1);
-          if(newScore[0].indexOf("-") == -1) {
-            earnedPoints += parseFloat(newScore[0]);
-            singleScore[2] = parseFloat(newScore[0]);
-            totalPoints += parseFloat(newScore[2]);
-            singleScore[3] = parseFloat(newScore[2]);
-          }
-        } else if(newScore[0].indexOf("-") == -1) {
-          earnedPoints += parseFloat(newScore[0]);
-          singleScore[2] = parseFloat(newScore[0]);
-          totalPoints += newScore.length == 1 ? 0 : parseFloat(newScore[1]);
-          singleScore[3] = newScore.length == 1 ? 0 : parseFloat(newScore[1]);
-        }
-        if(categories.indexOf(singleScore[0]) == -1 && newScore[0].indexOf("-") == -1) {
-          categories.push(singleScore[0]);
-        }
-        scoreData[i-1] = singleScore;
-      } else {
-        scoreData[i-1] = ["NotACategory", "", "", ""];
-      }
-    }
-    var studentPercentage = earnedPoints / totalPoints *100;
-    studentPercentage = parseFloat(studentPercentage).toFixed(2);
-
-    globalScoreData = scoreData;
-    if(gradeText.indexOf("%") == -1) {
-      gradeHTML.innerHTML += "(" + studentPercentage + "%)";
-    }
-
-    var htmlToInsert = '<form action=""><input type="checkbox" name="weighted" value="Weighted">Weighted by category?<br></form>';
-    var content = document.getElementById("content-main");
-    var newNode = document.createElement("div");
-    newNode.innerHTML = htmlToInsert;
-    this.newNode = newNode;
-
-    var target = content.getElementsByTagName("table")[1];
-    content.insertBefore(newNode, target);
-    document.getElementsByName("weighted")[0].addEventListener("change", showOrHideCategories, false);
-
-
-    console.log("Extension is loaded!");
   }
 }
 
-function saveChanges() {
-        // Get a value saved in a form.
-        var theValue = "textarea.value";
-        // Check that there's some code there.
-        if (!theValue) {
-          alert('Error: No value specified');
-          return;
+function main2(){
+  console.log("Calling main2");
+  var tables = document.getElementsByTagName("table");
+  var header;
+  var headerIndex;
+  var finalHeader;
+  var finalHeaderIndex;
+  for(var i = 0 ; i < tables.length ; i++) {
+    if(tables[i].innerHTML.indexOf("Due Date") > -1) {
+      header = tables[i];
+      headerIndex = i;
+    } else if(tables[i].innerHTML.indexOf("Course") > -1) {
+      finalHeader = tables[i];
+      finalHeaderIndex = i;
+    }
+  }
+  var topRows = finalHeader.getElementsByTagName("tr");
+  var topLocs = topRows[0].getElementsByTagName("th");
+  var gradeIndex;
+  var classNameIndex;
+  for(var i = 0 ; i < topLocs.length ; i++){
+    if(topLocs[i].innerHTML.indexOf("Final Grade") > -1){
+      gradeIndex = i;
+    }
+    if(topLocs[i].innerHTML.indexOf("Course") > -1) {
+      classNameIndex = i;
+    }
+  }
+  var gradeHTML = topRows[1].getElementsByTagName("td")[gradeIndex];
+  finalGradeHTML = gradeHTML;
+  className = topRows[1].getElementsByTagName("td")[classNameIndex].innerHTML;
+
+  var gradeText = gradeHTML.innerHTML;
+
+  categories = new Array();
+  var rows = header.getElementsByTagName("tr");
+  var locs = rows[0].getElementsByTagName("th");
+  var locTitles = new Array();
+  for(var i = 0 ; i < locs.length ; i++){
+    locTitles[i] = locs[i].innerHTML;
+  }
+
+  var scoreData = new Array();
+  var categoryLoc = locTitles.indexOf("Category");
+  var scoreLoc = locTitles.indexOf("Score");
+  var totalPoints = 0;
+  var earnedPoints = 0;
+
+  for(var i = 1 ; i < rows.length ; i++) {
+    var parsedRows = rows[i].getElementsByTagName("td");
+    var singleScore = new Array();
+    var purple = parsedRows[scoreLoc+2].innerHTML;
+    var orange = parsedRows[scoreLoc+3].innerHTML;
+    if(purple == "" && orange == "" && parsedRows[scoreLoc+4].innerHTML.indexOf("Score Not Published") == -1) {
+      singleScore[0] = parsedRows[categoryLoc].innerHTML;
+      if(singleScore[0].indexOf(">") > -1) {
+        singleScore[0] = singleScore[0].substring(singleScore[0].indexOf(">") + 1, singleScore[0].indexOf("</"));
+      }
+
+      singleScore[1] = parsedRows[scoreLoc+4].getElementsByTagName("span")[0].innerHTML;
+      var as = parsedRows[scoreLoc+4].getElementsByTagName("span")[0].getElementsByTagName("a");
+      var newScore = singleScore[1].split("/");
+      if(as.length > 0) {
+        newScore[0] = newScore[0].substring(newScore[0].indexOf(">")+1, newScore[0].length-1);
+        if(newScore[0].indexOf("-") == -1) {
+          earnedPoints += parseFloat(newScore[0]);
+          singleScore[2] = parseFloat(newScore[0]);
+          totalPoints += parseFloat(newScore[2]);
+          singleScore[3] = parseFloat(newScore[2]);
         }
-        // Save it using the Chrome extension storage API.
-        var objectToStore = {name: className, weighted : isWeighted, weightings : weightings};
-        console.log(objectToStore.name + "  " + objectToStore.weighted);
-        var jsonfile = {};
-        jsonfile[className] = objectToStore;
-        chrome.storage.sync.set(jsonfile, function() {
-          // Notify that we saved.
-          //alert('Settings saved' + chrome.runtime.lastError);
-        });
+      } else if(newScore[0].indexOf("-") == -1) {
+        earnedPoints += parseFloat(newScore[0]);
+        singleScore[2] = parseFloat(newScore[0]);
+        totalPoints += newScore.length == 1 ? 0 : parseFloat(newScore[1]);
+        singleScore[3] = newScore.length == 1 ? 0 : parseFloat(newScore[1]);
+      }
+      if(categories.indexOf(singleScore[0]) == -1 && newScore[0].indexOf("-") == -1) {
+        categories.push(singleScore[0]);
+      }
+      scoreData[i-1] = singleScore;
+    } else {
+      scoreData[i-1] = ["NotACategory", "", "", ""];
+    }
+  }
+  var studentPercentage = earnedPoints / totalPoints *100;
+  studentPercentage = parseFloat(studentPercentage).toFixed(2);
+
+  globalScoreData = scoreData;
+  if(gradeText.indexOf("%") == -1) {
+    gradeHTML.innerHTML += "(" + studentPercentage + "%)";
+  }
+
+  var htmlToInsert = '<form action=""><input type="checkbox" name="weighted" value="Weighted">Weighted by category?<br></form>';
+
+  var content = document.getElementById("content-main");
+  var newNode = document.createElement("div");
+  newNode.innerHTML = htmlToInsert;
+  this.newNode = newNode;
+
+  var target = content.getElementsByTagName("table")[1];
+  content.insertBefore(newNode, target);
+  if(isWeighted) {
+    document.getElementsByName("weighted")[0].checked = true;
+    showOrHideCategories();
+    reCalculate();
+  }
+  document.getElementsByName("weighted")[0].addEventListener("change", showOrHideCategories, false);
+
+
+  console.log("Extension is loaded!");
+
+}
+
+function saveChanges() {
+  // Get a value saved in a form.
+  var theValue = "textarea.value";
+  // Check that there's some code there.
+  if (!theValue) {
+    alert('Error: No value specified');
+    return;
+  }
+  // Save it using the Chrome extension storage API.
+  var objectToStore = {name: className, weighted : isWeighted, weightings : weightings};
+  console.log(objectToStore.name + "  " + objectToStore.weighted);
+  var jsonfile = {};
+  jsonfile[className] = objectToStore;
+  chrome.storage.sync.set(jsonfile, function() {
+    // Notify that we saved.
+    //alert('Settings saved' + chrome.runtime.lastError);
+  });
 }
 
 function loadData() {
   chrome.storage.sync.get(className, function(object) {
+    console.log(JSON.stringify(object));
     var realData = object[className];
+    if(realData !== undefined) {
     isWeighted = realData.weighted;
     weightings = realData.weightings;
     className = realData.name;
+    main2();
+  } else {
+    console.log("here");
+    isWeighted = false;
+    weightings = {};
+    main2();
+  }
   });
+
 }
 
 main();
