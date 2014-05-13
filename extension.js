@@ -10,20 +10,28 @@ var className;
 var isWeighted;
 var weightings;
 
+
 function showOrHideCategories(){
   if(document.getElementsByName("weighted")[0].checked) {
     var htmlToInsert = '<form action=""><input type="checkbox" name="weighted" value="Weighted" checked="true">Weighted by category?<br><br>';
-    htmlToInsert +='<table id="cats" border=1><tr><th align="center">Category</th><th align="center">Weighting</th></tr>';
+    htmlToInsert +='<table id="cats" border=1><tr><th align="center">Category</th><th align="center">Weighting</th><th align="center">Earned Points</th><th align="center">Total Points</th><th align="center">Percentage</th></tr>';
+    console.log(globalScoreData);  
     for(var i = 0 ; i < categories.length ; i++) {
       htmlToInsert +='<tr><td align="center">' + categories[i]+'</td>';
       var weight = "";
       if(weightings[categories[i]] !== undefined) {
         weight = weightings[categories[i]];
       }
-      htmlToInsert +='<td align="center"><input value="'+weight+'" type="text" id=\"'+categories[i]+ '\">%</td>';
+      var earned = "";
+      var total  = "";
+      var catPercent = "";
+      htmlToInsert +='<td align="center"><input style="text-align:center" value="'+weight+'" type="text" id=\"'+categories[i]+ '\">%</td>';
+      htmlToInsert +='<td align="center"><input style="text-align:center" value="'+earned+'" type="text" id=\"'+categories[i]+ 'Earn\"></td>';
+      htmlToInsert +='<td align="center"><input style="text-align:center" value="'+total+'" type="text" id=\"'+categories[i]+ 'Tot\"></td>';
+      htmlToInsert +='<td align="center" id=\"'+categories[i]+ 'Percent\">'+catPercent+'%</td>';
       htmlToInsert += '</tr>';
     }
-    htmlToInsert += '<tr><td></td><td align="center"><input type="button" id="calcButton" value="Update Final Grade"></td></tr></table></form>';
+    htmlToInsert += '<tr><td></td><td></td><td></td><td></td><td align="center"><input type="button" id="calcButton" value="Update Final Grade"></td></tr></table></form>';
     newNode.innerHTML = htmlToInsert;
     oldGrade = finalGradeHTML.innerHTML;
     document.getElementById("calcButton").addEventListener("click", reCalculate, false);
@@ -110,16 +118,18 @@ function main() {
 
   var gradeText = gradeHTML.innerHTML;
 
-  if(gradeText.indexOf("%") == -1) {
+  var loadingHTML = document.createElement("div");
+  loadingHTML.id = "KDSPSLoading";
+  var body = document.getElementsByTagName('body')[0];
 
+  if(document.getElementById("KDSPSLoading") === null) {
+    body.appendChild(loadingHTML);
     if(isWeighted === undefined) isWeighted = false;
     loadData();
-
   }
 }
 
 function main2(){
-  console.log("Calling main2");
   var tables = document.getElementsByTagName("table");
   var header;
   var headerIndex;
@@ -226,9 +236,6 @@ function main2(){
   }
   document.getElementsByName("weighted")[0].addEventListener("change", showOrHideCategories, false);
 
-
-  console.log("Extension is loaded!");
-
 }
 
 function saveChanges() {
@@ -241,7 +248,6 @@ function saveChanges() {
   }
   // Save it using the Chrome extension storage API.
   var objectToStore = {name: className, weighted : isWeighted, weightings : weightings};
-  console.log(objectToStore.name + "  " + objectToStore.weighted);
   var jsonfile = {};
   jsonfile[className] = objectToStore;
   chrome.storage.sync.set(jsonfile, function() {
@@ -252,19 +258,17 @@ function saveChanges() {
 
 function loadData() {
   chrome.storage.sync.get(className, function(object) {
-    console.log(JSON.stringify(object));
     var realData = object[className];
     if(realData !== undefined) {
-    isWeighted = realData.weighted;
-    weightings = realData.weightings;
-    className = realData.name;
-    main2();
-  } else {
-    console.log("here");
-    isWeighted = false;
-    weightings = {};
-    main2();
-  }
+      isWeighted = realData.weighted;
+      weightings = realData.weightings;
+      className = realData.name;
+      main2();
+    } else {
+      isWeighted = false;
+      weightings = {};
+      main2();
+    }
   });
 
 }
