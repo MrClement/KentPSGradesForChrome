@@ -15,7 +15,7 @@ function showOrHideCategories(){
   if(document.getElementsByName("weighted")[0].checked) {
     var htmlToInsert = '<form action=""><input type="checkbox" name="weighted" value="Weighted" checked="true">Weighted by category?<br><br>';
     htmlToInsert +='<table id="cats" border=1><tr><th align="center">Category</th><th align="center">Weighting</th><th align="center">Earned Points</th><th align="center">Total Points</th><th align="center">Percentage</th></tr>';
-    console.log(globalScoreData);  
+    console.log(globalScoreData);
     for(var i = 0 ; i < categories.length ; i++) {
       htmlToInsert +='<tr><td align="center">' + categories[i]+'</td>';
       var weight = "";
@@ -25,6 +25,19 @@ function showOrHideCategories(){
       var earned = "";
       var total  = "";
       var catPercent = "";
+      var earnedPts = 0;
+      var totalPts = 0;
+      for(var j = 0 ; j < globalScoreData.length ; j++) {
+        var score = globalScoreData[j];
+        if(score[0] == categories[i] && score[0] != "NotACategory" && score.length == 4) {
+          earnedPts += score[2];
+          totalPts += score[3];
+        }
+      }
+      earned += earnedPts;
+      total += totalPts;
+      catPercent = earnedPts / totalPts *100;
+      catPercent = parseFloat(catPercent).toFixed(2);
       htmlToInsert +='<td align="center"><input style="text-align:center" value="'+weight+'" type="text" id=\"'+categories[i]+ '\">%</td>';
       htmlToInsert +='<td align="center"><input style="text-align:center" value="'+earned+'" type="text" id=\"'+categories[i]+ 'Earn\"></td>';
       htmlToInsert +='<td align="center"><input style="text-align:center" value="'+total+'" type="text" id=\"'+categories[i]+ 'Tot\"></td>';
@@ -40,6 +53,9 @@ function showOrHideCategories(){
   } else {
     isWeighted = false;
     htmlToInsert = '<form action=""><input type="checkbox" name="weighted" value="Weighted">Weighted by category?<br></form>';
+    htmlToInsert +='<table id="points" border=1><tr><th align="center">Earned Points</th><th align="center">Total Points</th><th align="center">Percentage</th></tr>';
+    htmlToInsert +='<tr><td align="center"><input style="text-align:center" value="'+earned+'" type="text" id=\"'+categories[i]+ 'Earn\"></td>';
+    htmlToInsert +='<td align="center"><input style="text-align:center" value="'+total+'" type="text" id=\"'+categories[i]+ 'Earn\"></td>'
     newNode.innerHTML = htmlToInsert;
     finalGradeHTML.innerHTML = oldGrade;
     document.getElementsByName("weighted")[0].addEventListener("change", showOrHideCategories, false);
@@ -51,31 +67,22 @@ function reCalculate(){
   weightings = {};
   var categoryScores = new Array();
   categoryScores.length = categories.length;
-  for(var i = 0 ; i < globalScoreData.length ; i++) {
-    if(globalScoreData[i][0] != "NotACategory" && globalScoreData[i].length == 4) {
-      var loc = categoryScores[categories.indexOf(globalScoreData[i][0])];
-      if(loc === undefined) {
-        loc = new Array();
-        loc.length = 3;
-        loc[0] = 0;
-        loc[1] = 0;
-        var temp = document.getElementById(""+globalScoreData[i][0]).value;
-        temp = parseFloat(temp);
-        if(!isNaN(temp)) {
-          loc[2] = temp;
-          weightings[globalScoreData[i][0]] = temp;
-        } else {
-          alert("Please enter weightings as numbers only");
-        }
-      }
-      loc[0] += globalScoreData[i][2];
-      loc[1] += globalScoreData[i][3];
-      categoryScores[categories.indexOf(globalScoreData[i][0])] = loc;
-    }
-  }
   var newGrade = 0;
+
   for(var i = 0 ; i < categories.length; i++) {
-    newGrade += (categoryScores[i][0]/categoryScores[i][1])*categoryScores[i][2]/100;
+    var allEarned = parseFloat(document.getElementById(categories[i] + "Earn").value);
+    var allTotal =  parseFloat(document.getElementById(categories[i] + "Tot").value);
+    var allWeight = parseFloat(document.getElementById(categories[i]).value);
+    temp = parseFloat(allWeight);
+    if(!isNaN(temp)) {
+      weightings[categories[i]] = temp;
+    } else {
+      alert("Please enter weightings as numbers only.");
+    }
+    var newPercent =  (allEarned/allTotal)*allWeight/100;
+    newGrade += newPercent;
+    document.getElementById(categories[i] + "Percent").innerHTML = "" + parseFloat(allEarned/allTotal*100).toFixed(2) + "%";
+
   }
   newGrade *= 100;
   newGrade = parseFloat(newGrade).toFixed(2);
