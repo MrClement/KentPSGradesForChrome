@@ -12,6 +12,7 @@ var weightings;
 
 var globalEarnedPoints;
 var globalTotalPoints;
+var currentIndex;
 
 function showOrHideCategories(){
   if(document.getElementsByName("weighted")[0].checked) {
@@ -41,9 +42,9 @@ function showOrHideCategories(){
       catPercent = earnedPts / totalPts *100;
       catPercent = parseFloat(catPercent).toFixed(2);
       htmlToInsert +='<td align="center"><input style="text-align:center" value="'+weight+'" type="text" id=\"'+categories[i]+ '\">%</td>';
-      htmlToInsert +='<td align="center"><input style="text-align:center" value="'+earned+'" type="text" id=\"'+categories[i]+ 'Earn\"></td>';
-      htmlToInsert +='<td align="center"><input style="text-align:center" value="'+total+'" type="text" id=\"'+categories[i]+ 'Tot\"></td>';
-      htmlToInsert +='<td align="center" id=\"'+categories[i]+ 'Percent\">'+catPercent+'%</td>';
+      htmlToInsert +='<td align="center"><input style="text-align:center" value="'+earned+'" type="text" id=\"'+categories[i]+ '_Earn\"></td>';
+      htmlToInsert +='<td align="center"><input style="text-align:center" value="'+total+'" type="text" id=\"'+categories[i]+ '_Tot\"></td>';
+      htmlToInsert +='<td align="center" id=\"'+categories[i]+ '_Percent\">'+catPercent+'%</td>';
       htmlToInsert += '</tr>';
     }
     htmlToInsert += '<tr><td></td><td></td><td></td><td></td><td align="center"><input type="button" id="calcButton" value="Update Final Grade"></td></tr></table></form>';
@@ -51,9 +52,9 @@ function showOrHideCategories(){
     oldGrade = finalGradeHTML.innerHTML;
 
     for(var i = 0 ; i < categories.length ; i++){
-
-      document.getElementById(categories[i] + "Earn").addEventListener("change", recalculateWeightedPercent(categories[i]+"earn"), false);
-      document.getElementById(categories[i] + "Tot").addEventListener("change", recalculateWeightedPercent(categories[i]+"tot"), false);
+      currentIndex = i;
+      document.getElementById(categories[i] + "_Earn").addEventListener("change", recalculateWeightedPercent, false);
+      document.getElementById(categories[i] + "_Tot").addEventListener("change", recalculateWeightedPercent, false);
 
     }
 
@@ -84,8 +85,8 @@ function reCalculate(){
   var newGrade = 0;
 
   for(var i = 0 ; i < categories.length; i++) {
-    var allEarned = parseFloat(document.getElementById(categories[i] + "Earn").value);
-    var allTotal =  parseFloat(document.getElementById(categories[i] + "Tot").value);
+    var allEarned = parseFloat(document.getElementById(categories[i] + "_Earn").value);
+    var allTotal =  parseFloat(document.getElementById(categories[i] + "_Tot").value);
     var allWeight = parseFloat(document.getElementById(categories[i]).value);
     temp = parseFloat(allWeight);
     if(!isNaN(temp)) {
@@ -95,7 +96,7 @@ function reCalculate(){
     }
     var newPercent =  (allEarned/allTotal)*allWeight/100;
     newGrade += newPercent;
-    document.getElementById(categories[i] + "Percent").innerHTML = "" + parseFloat(allEarned/allTotal*100).toFixed(2) + "%";
+    document.getElementById(categories[i] + "_Percent").innerHTML = "" + parseFloat(allEarned/allTotal*100).toFixed(2) + "%";
 
   }
   newGrade *= 100;
@@ -129,9 +130,14 @@ function reCalculateUnweightedPercent(){
 
 }
 
-function recalculateWeightedPercent(evt){
-
-  console.log(evt);
+function recalculateWeightedPercent(){
+  var id = this.id;
+  var cat = id.split("_")[0];
+  var earned = parseFloat(document.getElementById(cat+"_Earn").value);
+  var total = parseFloat(document.getElementById(cat+"_Tot").value);
+  var percent = document.getElementById(cat+ "_Percent");
+  percent.innerHTML = parseFloat((earned/total)*100).toFixed(2) + "%";
+  //var earned = parseFloat(document.getElementByID(evt))
 
 }
 
@@ -290,11 +296,12 @@ function main2(){
     document.getElementsByName("weighted")[0].checked = true;
     showOrHideCategories();
     reCalculate();
+  } else {
+    document.getElementById("Earn").addEventListener("change", reCalculateUnweightedPercent, false);
+    document.getElementById("Tot").addEventListener("change", reCalculateUnweightedPercent, false);
+    document.getElementById("Percent").addEventListener("change", reCalculateUnweightedPoints, false);
   }
   document.getElementsByName("weighted")[0].addEventListener("change", showOrHideCategories, false);
-  document.getElementById("Earn").addEventListener("change", reCalculateUnweightedPercent, false);
-  document.getElementById("Tot").addEventListener("change", reCalculateUnweightedPercent, false);
-  document.getElementById("Percent").addEventListener("change", reCalculateUnweightedPoints, false);
 
 }
 
