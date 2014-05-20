@@ -74,6 +74,9 @@ function showOrHideCategories(){
     newNode.innerHTML = htmlToInsert;
     finalGradeHTML.innerHTML = oldGrade;
     document.getElementsByName("weighted")[0].addEventListener("change", showOrHideCategories, false);
+    document.getElementById("Earn").addEventListener("change", reCalculateUnweightedPercent, false);
+    document.getElementById("Tot").addEventListener("change", reCalculateUnweightedPercent, false);
+    document.getElementById("Percent").addEventListener("change", reCalculateUnweightedPoints, false);
     saveChanges();
   }
 }
@@ -83,6 +86,8 @@ function reCalculate(){
   var categoryScores = new Array();
   categoryScores.length = categories.length;
   var newGrade = 0;
+  var totalEarned = 0;
+  var totalTotal = 0;
 
   for(var i = 0 ; i < categories.length; i++) {
     var allEarned = parseFloat(document.getElementById(categories[i] + "_Earn").value);
@@ -94,15 +99,18 @@ function reCalculate(){
     } else {
       alert("Please enter weightings as numbers only.");
     }
-    var newPercent =  (allEarned/allTotal)*allWeight/100;
-    newGrade += newPercent;
-    document.getElementById(categories[i] + "_Percent").innerHTML = "" + parseFloat(allEarned/allTotal*100).toFixed(2) + "%";
+    totalEarned += allEarned * (allWeight/100);
+    totalTotal += allTotal * (allWeight/100);
 
   }
-  newGrade *= 100;
-  newGrade = parseFloat(newGrade).toFixed(2);
+  if(totalTotal != 0) {
+    newGrade = (totalEarned/totalTotal)*100;
+    newGrade = parseFloat(newGrade).toFixed(2) + "%";
+  } else {
+    newGrade = '--';
+  }
   var orgGrade = finalGradeHTML.innerHTML;
-  orgGrade = orgGrade.substring(0, orgGrade.indexOf("(") + 1) + newGrade + "%)";
+  orgGrade = orgGrade.substring(0, orgGrade.indexOf("(") + 1) + newGrade + ")";
   finalGradeHTML.innerHTML = orgGrade;
   saveChanges();
 }
@@ -123,8 +131,12 @@ function reCalculateUnweightedPercent(){
 
   var allEarned = parseFloat(document.getElementById("Earn").value);
   var allTotal =  parseFloat(document.getElementById("Tot").value);
-
-  var newPercent = parseFloat((allEarned/allTotal) * 100).toFixed(2) + "%";
+  var newPercent = "";
+  if(allTotal != 0) {
+    newPercent = parseFloat((allEarned/allTotal) * 100).toFixed(2) + "%";
+  } else {
+    newPercent = "--";
+  }
 
   (document.getElementById("Percent").value) = newPercent;
 
@@ -136,8 +148,13 @@ function recalculateWeightedPercent(){
   var earned = parseFloat(document.getElementById(cat+"_Earn").value);
   var total = parseFloat(document.getElementById(cat+"_Tot").value);
   var percent = document.getElementById(cat+ "_Percent");
-  percent.innerHTML = parseFloat((earned/total)*100).toFixed(2) + "%";
-  //var earned = parseFloat(document.getElementByID(evt))
+  var newPercent = ";"
+  if(total != 0) {
+    newPercent = parseFloat((earned/total)*100).toFixed(2) + "%";
+  } else {
+    newPercent = "--";
+  }
+  percent.innerHTML = newPercent;
 
 }
 
@@ -271,13 +288,16 @@ function main2(){
   }
   globalEarnedPoints = earnedPoints;
   globalTotalPoints = totalPoints;
-  var studentPercentage = earnedPoints / totalPoints *100;
-  studentPercentage = parseFloat(studentPercentage).toFixed(2);
+  var studentPercentage = ""
+  if(totalPoints != 0) {
+    studentPercentage = earnedPoints / totalPoints *100;
+    studentPercentage = parseFloat(studentPercentage).toFixed(2) + "%";
+  } else {
+    studentPercentage = "--";
+  }
 
   globalScoreData = scoreData;
-  if(gradeText.indexOf("%") == -1) {
-    gradeHTML.innerHTML += "(" + studentPercentage + "%)";
-  }
+  gradeHTML.innerHTML += "(" + studentPercentage + ")";
 
   htmlToInsert = '<form action=""><input type="checkbox" name="weighted" value="Weighted">Weighted by category?<br></form>';
   htmlToInsert +='<table id="points" border=1><tr><th align="center">Earned Points</th><th align="center">Total Points</th><th align="center">Percentage</th></tr>';
