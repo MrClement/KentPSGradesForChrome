@@ -269,7 +269,7 @@ function main2(){
       var newScore = singleScore[1].split("/");
       if(as.length > 0) {
         newScore[0] = newScore[0].substring(newScore[0].indexOf(">")+1, newScore[0].length-1);
-        if(newScore[0].indexOf("-") == -1) {
+        if(newScore[0].indexOf("-") == -1 && newScore[0] != "") {
           earnedPoints += parseFloat(newScore[0]);
           singleScore[2] = parseFloat(newScore[0]);
           totalPoints += parseFloat(newScore[2]);
