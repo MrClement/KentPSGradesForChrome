@@ -275,7 +275,7 @@ function main2(){
           totalPoints += parseFloat(newScore[2]);
           singleScore[3] = parseFloat(newScore[2]);
         }
-      } else if(newScore[0].indexOf("-") == -1) {
+      } else if(newScore[0].indexOf("-") == -1 && newScore[0] != "") {
         earnedPoints += parseFloat(newScore[0]);
         singleScore[2] = parseFloat(newScore[0]);
         totalPoints += newScore.length == 1 ? 0 : parseFloat(newScore[1]);
