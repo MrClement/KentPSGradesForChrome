@@ -41,6 +41,9 @@ function showOrHideCategories(){
       total += totalPts;
       catPercent = earnedPts / totalPts *100;
       catPercent = parseFloat(catPercent).toFixed(2);
+      earned = parseFloat(earned).toFixed(2);
+      total = parseFloat(total).toFixed(2);
+      weight =  parseFloat(weight).toFixed(2);
       htmlToInsert +='<td align="center"><input style="text-align:center" value="'+weight+'" type="text" id=\"'+categories[i]+ '\">%</td>';
       htmlToInsert +='<td align="center"><input style="text-align:center" value="'+earned+'" type="text" id=\"'+categories[i]+ '_Earn\"></td>';
       htmlToInsert +='<td align="center"><input style="text-align:center" value="'+total+'" type="text" id=\"'+categories[i]+ '_Tot\"></td>';
@@ -65,12 +68,12 @@ function showOrHideCategories(){
     isWeighted = false;
     var earned = globalEarnedPoints;
     var total = globalTotalPoints;
-    var percent = parseFloat((earned/total) * 100).toFixed(2);
+    var percent = parseFloat((earned/total) * 100).toFixed(2) + "%";
     htmlToInsert = '<form action=""><input type="checkbox" name="weighted" value="Weighted">Weighted by category?<br></form>';
     htmlToInsert +='<table id="points" border=1><tr><th align="center">Earned Points</th><th align="center">Total Points</th><th align="center">Percentage</th></tr>';
     htmlToInsert +='<tr><td align="center"><input style="text-align:center" value="'+earned+'" type="text" id=\"Earn\"></td>';
     htmlToInsert +='<td align="center"><input style="text-align:center" value="'+total+'" type="text" id=\"Tot\"></td>';
-    htmlToInsert +='<td align="center"><input style="text-align:center" value="'+percent+'%" type="text" id=\"Percent\"></td>';
+    htmlToInsert +='<td align="center"><input style="text-align:center" value="'+percent+'" type="text" id=\"Percent\"></td>';
     newNode.innerHTML = htmlToInsert;
     finalGradeHTML.innerHTML = oldGrade;
     document.getElementsByName("weighted")[0].addEventListener("change", showOrHideCategories, false);
@@ -286,6 +289,8 @@ function main2(){
       scoreData[i-1] = ["NotACategory", "", "", ""];
     }
   }
+  earnedPoints = parseFloat(earnedPoints).toFixed(2);
+  totalPoints = parseFloat(totalPoints).toFixed(2);
   globalEarnedPoints = earnedPoints;
   globalTotalPoints = totalPoints;
   var studentPercentage = ""
@@ -303,7 +308,7 @@ function main2(){
   htmlToInsert +='<table id="points" border=1><tr><th align="center">Earned Points</th><th align="center">Total Points</th><th align="center">Percentage</th></tr>';
   htmlToInsert +='<tr><td align="center"><input style="text-align:center" value="'+earnedPoints+'" type="text" id=\"Earn\"></td>';
   htmlToInsert +='<td align="center"><input style="text-align:center" value="'+totalPoints+'" type="text" id=\"Tot\"></td>';
-  htmlToInsert +='<td align="center"><input style="text-align:center" value="'+studentPercentage+'%" type="text" id=\"Percent\"></td>';
+  htmlToInsert +='<td align="center"><input style="text-align:center" value="'+studentPercentage+'" type="text" id=\"Percent\"></td>';
 
   var content = document.getElementById("content-main");
   var newNode = document.createElement("div");
@@ -317,9 +322,9 @@ function main2(){
     showOrHideCategories();
     reCalculate();
   } else {
+    document.getElementById("Percent").addEventListener("change", reCalculateUnweightedPoints, false);
     document.getElementById("Earn").addEventListener("change", reCalculateUnweightedPercent, false);
     document.getElementById("Tot").addEventListener("change", reCalculateUnweightedPercent, false);
-    document.getElementById("Percent").addEventListener("change", reCalculateUnweightedPoints, false);
   }
   document.getElementsByName("weighted")[0].addEventListener("change", showOrHideCategories, false);
 
