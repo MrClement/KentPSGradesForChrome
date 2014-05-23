@@ -1,8 +1,13 @@
 chrome.tabs.onUpdated.addListener(function(id, info, tab){
-
-    if (tab.url.toLowerCase().indexOf("powerschool.kentdenver.org") != -1){
+    var url = tab.url.toLowerCase();
+    if (url.indexOf("powerschool.kentdenver.org") != -1){
       chrome.pageAction.show(tab.id);
-      chrome.tabs.executeScript(null, {"file": "extension.js"});
+      if(url.indexOf("home.html") != -1) {
+        chrome.tabs.executeScript(null, {"file": "mainpage.js"});
+      } else if(url.indexOf("scores") != -1 ) {
+        chrome.tabs.executeScript(null, {"file": "extension.js"});
+
+      }
     }
 
 });
